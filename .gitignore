@@ -1,5 +1,7 @@
-.ccls-cahce
+.ccls-cache
 Makefile
 bensh.make
 bin/Debug
 obj
+src/**.gch
+src/**/**.gch

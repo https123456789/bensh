@@ -1,2 +1,1 @@
-rm -rf obj
-rm bensh.make Makefile
+rm Makefile bensh.make
