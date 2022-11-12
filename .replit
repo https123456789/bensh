@@ -1,7 +1,7 @@
 compile = "./build.sh"
 run = "./bin/Debug/bensh"
 entrypoint = "main.c"
-hidden = ["main", "main-debug", "**/*.o", "**/*.d", ".ccls-cache", "Makefile", "bensh.make", "obj"]
+hidden = ["main", "main-debug", "**/*.o", "**/*.d", ".ccls-cache", "Makefile", "bensh.make", "obj", "**/*.gch"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", ".ccls-cache"]

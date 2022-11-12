@@ -1,3 +1,6 @@
+#include "bensh.hpp"
+
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -24,22 +27,16 @@ int main(int argc, char **argv) {
 
     term.c_cc[VMIN] = 1;  // Minimum of 1 characters
     term.c_cc[VTIME] = 0; // Time delay for input
-    /*term.c_lflag &= (~ICANON & ~ECHO);
-    term.c_cc[VTIME] = 0;
-    term.c_cc[VMIN] = 1;
-
-    term.c_iflag &=
-        ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
-    term.c_oflag &= ~OPOST;
-    term.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    term.c_cflag &= ~(CSIZE | PARENB);
-    */
 
     if (tcsetattr(fileno(stdin), TCSANOW, &term) < 0) {
         std::cerr << "Unable to set terminal to change terminal configuration"
                   << std::endl;
         return -1;
     }
+
+    // Connect the signal handler
+    std::signal(SIGINT, signalHandler);
+    std::signal(SIGTERM, signalHandler);
 
     std::string input = "";
     bool prompt = true;
@@ -81,25 +78,6 @@ int main(int argc, char **argv) {
             input = "";
         }
     }
-
-    /*while (1) {
-        if (prompt) {
-            std::cout << ">> ";
-            prompt = false;
-        }
-        int c = 0;
-        // c = getch();
-        switch (c) {
-        default:
-            input += c;
-            std::cout << input;
-            break;
-        }
-        // std::getline(std::cin, s);
-        if (flushLine) {
-            std::cout << input;
-        }
-    }*/
 
     // Restore terminal state
     if (tcsetattr(fileno(stdin), TCSANOW, &term_save) < 0) {

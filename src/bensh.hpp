@@ -1,0 +1,3 @@
+#include <iostream>
+
+void signalHandler(int signum);
