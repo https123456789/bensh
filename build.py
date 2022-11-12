@@ -15,7 +15,7 @@ if (time() / 100) % 10 == 0:
 print("Building object files...")
 
 for file in files:
-    print(f"\t [{i + 1} / {len(files)}] {file}")
+    print(f"\t\x1b[32m[{i + 1} / {len(files)}]\x1b[0m {file}")
     os.system(f"clang-format {file} --style=file -i")
     os.system(f"mkdir -p obj && cd obj && g++ -c ../{file} -g")
     i += 1

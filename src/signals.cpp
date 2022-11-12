@@ -3,7 +3,7 @@
 void signalHandler(int signum) {
     switch (signum) {
     case 2: // CTRL C
-        std::cout << "\nCTRL C\n";
+        std::cout << "^C" << std::flush;
         break;
     default:
         std::cout << "\nInterrupt signal (" << signum << ") received.\n";
