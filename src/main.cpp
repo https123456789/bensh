@@ -191,14 +191,17 @@ void run_command(std::vector<std::string> command) {
         int r = execvp(command[0].c_str(), strCommand);
         std::string sc = "";
         for (int i = 0; i < command.size(); i++) {
+            if (i != 0) {
+                sc += " ";
+            }
             sc += command[i];
         }
         if (print_command_error(errno, sc)) {
-            return;
+            exit(errno);
         }
         std::cerr << "execp failed " << r << " - errno " << errno << "\n"
                   << std::strerror(errno) << "\n";
-        exit(1);
+        exit(errno);
     } else {
         waitRes = waitpid(childPid, &statLoc, WUNTRACED);
     }
