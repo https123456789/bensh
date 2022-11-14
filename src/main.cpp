@@ -1,14 +1,21 @@
 #include "bensh.hpp"
 
+#include <cassert>
+#include <cerrno>
 #include <csignal>
+#include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <stdio.h>
+#include <sys/wait.h>
 #include <termios.h>
+#include <unistd.h>
 #include <vector>
 
 std::vector<std::string> parse_command(std::string s);
+bool print_command_error(int e, std::string cs);
+void run_command(std::vector<std::string> command);
 
 int main(int argc, char **argv) {
     std::cout << "\u250C\u2500\u2500\u2500\u2500"
@@ -69,7 +76,9 @@ int main(int argc, char **argv) {
         }
 
         c = pbuf->sbumpc();
-        std::cout << c << std::flush;
+        if (c >= 0x20 && c <= 0x7e) {
+            std::cout << c << std::flush;
+        }
 
         switch (c) {
         case 0x8:
@@ -94,18 +103,16 @@ int main(int argc, char **argv) {
         if (flushLine) {
             flushLine = false;
             prompt = true;
-            std::cout << "\n\r" << input;
+            std::cout << "\n\r";
 
             std::vector<std::string> command = parse_command(input);
 
-            for (int i = 0; i < command.size(); i++) {
-                if (command[i] == std::string("exit") && i == 0) {
-                    std::cout << "\n";
-                    goto endLabel;
-                    break;
-                }
-                // std::cout << "\n--- " << command[i] << "\n" << std::flush;
+            if (command[0] == std::string("exit")) {
+                std::cout << "\n";
+                goto endLabel;
             }
+
+            run_command(command);
 
             if (input == std::string("exit")) {
             }
@@ -156,4 +163,43 @@ std::vector<std::string> parse_command(std::string s) {
     command.push_back(sect);
 
     return command;
+}
+
+bool print_command_error(int e, std::string cs) {
+    if (e == 2) {
+        std::cerr << "\x1b[31mNo such command '" << cs << "'\x1b[0m\n\r";
+        return true;
+    }
+    return false;
+}
+
+void run_command(std::vector<std::string> command) {
+    pid_t childPid;
+    pid_t waitRes;
+    int statLoc;
+
+    childPid = fork();
+    if (childPid == 0) {
+        // Convert the command to an array of char pointers
+        char *strCommand[command.size() + 1];
+        for (int i = 0; i < command.size(); i++) {
+            strCommand[i] = const_cast<char *>(command[i].c_str());
+        }
+        strCommand[command.size()] = (char *)NULL;
+        // Execute the command
+        // This will never return to our code if it works
+        int r = execvp(command[0].c_str(), strCommand);
+        std::string sc = "";
+        for (int i = 0; i < command.size(); i++) {
+            sc += command[i];
+        }
+        if (print_command_error(errno, sc)) {
+            return;
+        }
+        std::cerr << "execp failed " << r << " - errno " << errno << "\n"
+                  << std::strerror(errno) << "\n";
+        exit(1);
+    } else {
+        waitRes = waitpid(childPid, &statLoc, WUNTRACED);
+    }
 }

@@ -8,5 +8,6 @@
         pkgs.premake5
         pkgs.neovim
         pkgs.python310
+        pkgs.tokei
 	];
 }
