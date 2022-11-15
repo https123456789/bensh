@@ -26,7 +26,6 @@ graph TD
 
 ## To Do
 
-- Add `cd` command
 - Add `help` command
 - Add shell scripting
 - Add configuration files

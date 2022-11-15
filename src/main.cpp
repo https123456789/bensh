@@ -1,13 +1,12 @@
 #include "bensh.hpp"
 
-#include <cassert>
 #include <cerrno>
+#include <climits>
 #include <csignal>
 #include <cstring>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <stdio.h>
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
@@ -16,6 +15,7 @@
 std::vector<std::string> parse_command(std::string s);
 bool print_command_error(int e, std::string cs);
 void run_command(std::vector<std::string> command);
+void restore_term(struct termios *save);
 
 int main(int argc, char **argv) {
     std::cout << "\u250C\u2500\u2500\u2500\u2500"
@@ -57,9 +57,27 @@ int main(int argc, char **argv) {
     std::signal(SIGINT, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
+    // Setup IO variables
     std::string input = "";
     bool prompt = true;
     bool flushLine = false;
+
+    // Shell env variables
+    std::string cwd = "";
+
+    // Load cwd
+    {
+        char buf[PATH_MAX];
+        if (getcwd(buf, sizeof(buf)) != NULL) {
+            std::cout << "\x1b[36m[DEBUG] CWD: " << buf << "\x1b[0m\n\r";
+        } else {
+            // Error
+            std::cerr << "\x1b[31mFatal Error: " << std::strerror(errno)
+                      << "\x1b[0m\n\r";
+            restore_term(&term_save);
+            _Exit(1);
+        }
+    }
 
     // Read single characters from cin.
     std::streambuf *pbuf = std::cin.rdbuf();
@@ -108,13 +126,13 @@ int main(int argc, char **argv) {
             std::vector<std::string> command = parse_command(input);
 
             if (command[0] == std::string("exit")) {
-                std::cout << "\n";
                 goto endLabel;
-            }
-
-            run_command(command);
-
-            if (input == std::string("exit")) {
+            } else if (command[0] == std::string("cd")) {
+                if (cd(command) < 0) {
+                    std::cerr << "\x1b[31mFailed to change working directory.\x1b[0m\n\r";
+                }
+            } else {
+                run_command(command);
             }
 
             input = "";
@@ -123,86 +141,24 @@ int main(int argc, char **argv) {
 
 endLabel:
     // Restore terminal state
-    if (tcsetattr(fileno(stdin), TCSANOW, &term_save) < 0) {
-        std::cerr << "Unable to restore terminal mode" << std::endl;
-        return -1;
-    }
-
+    restore_term(&term_save);
     return 0;
 }
 
-std::vector<std::string> parse_command(std::string s) {
-    std::vector<std::string> command = {};
-    const char delim = ' ';
-    char c;
-    int i = 0;
-    bool inStr = false;
-    std::string sect = "";
-    std::vector<char> chars(s.begin(), s.end());
-
-    while (i < chars.size()) {
-        switch (chars[i]) {
-        case '"':
-        case '\'':
-            inStr = !inStr;
-            break;
-        case delim:
-            if (!inStr) {
-                command.push_back(sect);
-                sect = "";
-            }
-            break;
-        default:
-            sect += chars[i];
-            break;
+int cd(std::vector<std::string> command) {
+    if (command.size() < 2) {
+        if (command.size() == 1) {
+            command.push_back("~");
+        } else {
+            command[1] == std::string("~");
         }
-        if (chars[i] == delim) {
-        }
-        i++;
     }
-    command.push_back(sect);
-
-    return command;
+    return chdir(command[1].c_str());
 }
 
-bool print_command_error(int e, std::string cs) {
-    if (e == 2) {
-        std::cerr << "\x1b[31mNo such command '" << cs << "'\x1b[0m\n\r";
-        return true;
-    }
-    return false;
-}
-
-void run_command(std::vector<std::string> command) {
-    pid_t childPid;
-    pid_t waitRes;
-    int statLoc;
-
-    childPid = fork();
-    if (childPid == 0) {
-        // Convert the command to an array of char pointers
-        char *strCommand[command.size() + 1];
-        for (int i = 0; i < command.size(); i++) {
-            strCommand[i] = const_cast<char *>(command[i].c_str());
-        }
-        strCommand[command.size()] = (char *)NULL;
-        // Execute the command
-        // This will never return to our code if it works
-        int r = execvp(command[0].c_str(), strCommand);
-        std::string sc = "";
-        for (int i = 0; i < command.size(); i++) {
-            if (i != 0) {
-                sc += " ";
-            }
-            sc += command[i];
-        }
-        if (print_command_error(errno, sc)) {
-            exit(errno);
-        }
-        std::cerr << "execp failed " << r << " - errno " << errno << "\n"
-                  << std::strerror(errno) << "\n";
-        exit(errno);
-    } else {
-        waitRes = waitpid(childPid, &statLoc, WUNTRACED);
+void restore_term(struct termios *save) {
+    if (tcsetattr(fileno(stdin), TCSANOW, &(*save)) < 0) {
+        std::cerr << "Unable to restore terminal mode" << std::endl;
+        _Exit(1);
     }
 }

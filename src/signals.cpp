@@ -1,4 +1,5 @@
 #include "bensh.hpp"
+#include <iostream>
 
 void signalHandler(int signum) {
     switch (signum) {
