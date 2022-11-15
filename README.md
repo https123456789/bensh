@@ -2,6 +2,12 @@
 
 A shell written with my common use cases in mind.
 
+## Features
+
+- Run any command on `PATH`.
+- `exit`
+- `cd`
+
 ## Design
 
 ```mermaid
