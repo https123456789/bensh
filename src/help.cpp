@@ -11,21 +11,21 @@ namespace fs = std::filesystem;
 void print_help(void) {
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    for (int i = 0; i < (w.ws_col / 2) - 10; i++) {
+    for (int i = 0; i < (w.ws_col - 10) / 2; i++) {
         std::cout << " ";
     }
     std::cout << "\u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\r";
-    for (int i = 0; i < (w.ws_col / 2) - 10; i++) {
+    for (int i = 0; i < (w.ws_col - 10) / 2; i++) {
         std::cout << " ";
     }
     std::cout << "\u2502 Help \u2502\n\r";
-    for (int i = 0; i < (w.ws_col / 2) - 10; i++) {
+    for (int i = 0; i < (w.ws_col - 10) / 2; i++) {
         std::cout << " ";
     }
     std::cout << "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\r";
 
-    std::cout << "cd - Change the current directory\n\r";
-    std::cout << "help - Show this help message\n\r";
+    print_centered_text_line(std::string("cd - Change the current directory"));
+    print_centered_text_line(std::string("help - Show this help message"));
 }
 
 std::vector<std::string> get_path_commands(void) {
