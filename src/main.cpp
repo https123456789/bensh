@@ -55,6 +55,7 @@ int main(int argc, char **argv) {
 
     // Connect the signal handler
     std::signal(SIGINT, signalHandler);
+    std::signal(SIGTSTP, signalHandler);
     std::signal(SIGTERM, signalHandler);
 
     // Setup IO variables
@@ -131,6 +132,8 @@ int main(int argc, char **argv) {
                 if (cd(command) < 0) {
                     std::cerr << "\x1b[31mFailed to change working directory.\x1b[0m\n\r";
                 }
+            } else if (command[0] == std::string("help")) {
+                print_help();
             } else {
                 run_command(command);
             }
