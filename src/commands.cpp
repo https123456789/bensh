@@ -7,6 +7,8 @@
 #include <cstring>
 #include <csignal>
 
+pid_t childPid;
+
 std::vector<std::string> parse_command(std::string s) {
     std::vector<std::string> command = {};
     const char delim = ' ';
@@ -50,7 +52,6 @@ bool print_command_error(int e, std::string cs) {
 }
 
 void run_command(std::vector<std::string> command) {
-    pid_t childPid;
     pid_t waitRes;
     int statLoc;
 

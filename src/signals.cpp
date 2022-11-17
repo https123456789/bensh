@@ -3,24 +3,22 @@
 #include <setjmp.h>
 #include <signal.h>
 
+extern pid_t childPid;
 extern sigjmp_buf env;
 extern volatile sig_atomic_t jump_active;
 
 void signalHandler(int signum) {
-    switch (signum) {
-    case 2: // CTRL C
-        std::cout << "^C" << std::flush;
-        break;
-    default:
-        std::cout << "\nInterrupt signal (" << signum << ") received.\n";
-        _Exit(signum);
-        break;
-    }
+    std::cout << "\nInterrupt signal (" << signum << ") received.\n";
+    _Exit(signum);
 }
 
 void signalIntHandler(int signum) {
     if (!jump_active) {
         return;
+    }
+    if (childPid) {
+        // Send the interupt to the child
+        kill(childPid, SIGINT);
     }
     siglongjmp(env, 42);
 }
