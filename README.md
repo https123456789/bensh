@@ -14,8 +14,6 @@ This project was heavily inspired by [indradhanush's](https://github.com/indradh
 ## Known Bugs :bug: :beetle: :cricket:
 
 - [#1 Arrow Keys Combined With Backspace Can Remove Prompt](https://github.com/https123456789/bensh/issues/1)
-- [#2 Killing children results in zombie/defunct processes.](https://github.com/https123456789/bensh/issues/2)
-
 ## To Do
 
 - Add shell scripting
@@ -26,7 +24,6 @@ This project was heavily inspired by [indradhanush's](https://github.com/indradh
 - Add up and down arrow history movement
 - Add left and right arrow comamnd editing
 - Fix prompt bug ([#1](https://github.com/https123456789/bensh/issues/1))
-- Stop making zombies by killing children [#2](https://github.com/https123456789/bensh/issues/2)
 
 ## Design
 
