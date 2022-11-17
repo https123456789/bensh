@@ -1,7 +1,7 @@
 { pkgs }: {
 	deps = [
 		pkgs.clang-tools
-  pkgs.gcc
+        pkgs.gcc
 		pkgs.ccls
 		pkgs.gdb
 		pkgs.gnumake
@@ -9,5 +9,6 @@
         pkgs.neovim
         pkgs.python310
         pkgs.tokei
+        pkgs.pstree
 	];
 }

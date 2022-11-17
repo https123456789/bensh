@@ -2,6 +2,7 @@
 #include <string>
 
 void signalHandler(int signum);
+void signalIntHandler(int signum);
 int cd(std::vector<std::string> command);
 std::vector<std::string> parse_command(std::string s);
 bool print_command_error(int e, std::string cs);

@@ -7,10 +7,14 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 #include <sys/wait.h>
 #include <termios.h>
 #include <unistd.h>
-#include <vector>
+#include <setjmp.h>
+
+sigjmp_buf env;
+volatile sig_atomic_t jump_active = 0;
 
 std::vector<std::string> parse_command(std::string s);
 bool print_command_error(int e, std::string cs);
@@ -54,9 +58,27 @@ int main(int argc, char **argv) {
     }
 
     // Connect the signal handler
-    std::signal(SIGINT, signalHandler);
-    std::signal(SIGTSTP, signalHandler);
-    std::signal(SIGTERM, signalHandler);
+    struct sigaction siginta;
+    struct sigaction sigtstpa;
+    struct sigaction sigterma;
+
+    // SIGINT
+    siginta.sa_handler = signalIntHandler;
+    sigemptyset(&siginta.sa_mask);
+    siginta.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &siginta, NULL);
+
+    // SIGTSTP
+    sigtstpa.sa_handler = signalIntHandler;
+    sigemptyset(&sigtstpa.sa_mask);
+    sigtstpa.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sigtstpa, NULL);
+    
+    // SIGTERM
+    sigterma.sa_handler = signalIntHandler;
+    sigemptyset(&sigterma.sa_mask);
+    sigterma.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sigterma, NULL);
 
     // Setup IO variables
     std::string input = "";
@@ -84,6 +106,11 @@ int main(int argc, char **argv) {
     std::streambuf *pbuf = std::cin.rdbuf();
     bool done = false;
     while (!done) {
+        if (sigsetjmp(env, 1) == 42) {
+            std::cout << "^C\n\r";
+            prompt = true;
+        }
+        jump_active = 1;
         if (prompt) {
             std::cout << "\x1b[32m>>\x1b[0m ";
             prompt = false;
@@ -125,6 +152,7 @@ int main(int argc, char **argv) {
             std::cout << "\n\r";
 
             std::vector<std::string> command = parse_command(input);
+            input = "";
 
             if (command[0] == std::string("exit")) {
                 goto endLabel;
@@ -137,8 +165,6 @@ int main(int argc, char **argv) {
             } else {
                 run_command(command);
             }
-
-            input = "";
         }
     }
 

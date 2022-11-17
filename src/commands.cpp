@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <sys/wait.h>
 #include <cstring>
+#include <csignal>
 
 std::vector<std::string> parse_command(std::string s) {
     std::vector<std::string> command = {};
@@ -61,6 +62,7 @@ void run_command(std::vector<std::string> command) {
             strCommand[i] = const_cast<char *>(command[i].c_str());
         }
         strCommand[command.size()] = (char *)NULL;
+        
         // Execute the command
         // This will never return to the code if it works
         int r = execvp(command[0].c_str(), strCommand);

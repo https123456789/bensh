@@ -2,15 +2,19 @@
 
 A shell written with my common use cases in mind.
 
+This project was heavily inspired by [indradhanush's](https://github.com/indradhanush) [blog post on shells](https://indradhanush.github.io/blog/writing-a-unix-shell-part-1) and the [Build Your Own X](https://github.com/codecrafters-io/build-your-own-x) project.
+
 ## Features
 
 - Run any command on `PATH`.
 - `exit`
 - `cd`
+- Find new and interesting bugs :sweat_smile:
 
 ## Known Bugs :bug: :beetle: :cricket:
 
 - [#1 Arrow Keys Combined With Backspace Can Remove Prompt](https://github.com/https123456789/bensh/issues/1)
+- [#2 Killing children results in zombie/defunct processes.](https://github.com/https123456789/bensh/issues/2)
 
 ## To Do
 
@@ -21,8 +25,8 @@ A shell written with my common use cases in mind.
 - Add `info` command
 - Add up and down arrow history movement
 - Add left and right arrow comamnd editing
-- Add signals for commands
 - Fix prompt bug ([#1](https://github.com/https123456789/bensh/issues/1))
+- Stop making zombies by killing children [#2](https://github.com/https123456789/bensh/issues/2)
 
 ## Design
 
