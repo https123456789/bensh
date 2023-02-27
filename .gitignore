@@ -1,7 +1,9 @@
 .ccls-cache
 Makefile
-bensh.make
-bin/Debug
-obj
+bin
 src/**.gch
 src/**/**.gch
+src/**.o
+src/**/**.o
+.breakpoints
+.cache
