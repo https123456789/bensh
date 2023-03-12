@@ -1,5 +1,4 @@
 .ccls-cache
-Makefile
 bin
 src/**.gch
 src/**/**.gch
