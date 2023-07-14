@@ -1,6 +1,7 @@
 { pkgs }: {
 	deps = [
-		pkgs.clang-tools
+		pkgs.cpplint
+        pkgs.clang-tools
         pkgs.gcc
 		pkgs.ccls
 		pkgs.gdb

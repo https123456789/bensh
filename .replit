@@ -6,6 +6,9 @@ hidden = ["main", "main-debug", "**/*.o", "**/*.d", ".ccls-cache", "Makefile", "
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", ".ccls-cache"]
 
+[nix]
+channel = "stable-23_05"
+
 [debugger]
 support = true
 

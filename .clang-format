@@ -124,7 +124,7 @@ PenaltyReturnTypeOnItsOwnLine: 60
 PenaltyIndentedWhitespace: 0
 PointerAlignment: Right
 ReflowComments:  true
-SortIncludes:    true
+SortIncludes: false  # Don't sort the includes so we can arrange then as per google style
 SortJavaStaticImport: Before
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
@@ -140,7 +140,7 @@ SpaceAroundPointerQualifiers: Default
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyBlock: false
 SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
+SpacesBeforeTrailingComments: 2
 SpacesInAngles:  false
 SpacesInConditionalStatement: false
 SpacesInContainerLiterals: true

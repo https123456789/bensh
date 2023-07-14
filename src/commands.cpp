@@ -1,11 +1,12 @@
-#include "bensh.hpp"
+// Copyright 2023 Ben Landon
 
-#include <iostream>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <cerrno>
-#include <sys/wait.h>
-#include <cstring>
 #include <csignal>
+#include <cstring>
+#include <iostream>
+#include "bensh.hpp"
 
 pid_t childPid;
 
@@ -34,8 +35,6 @@ std::vector<std::string> parse_command(std::string s) {
             sect += chars[i];
             break;
         }
-        if (chars[i] == delim) {
-        }
         i++;
     }
     command.push_back(sect);
@@ -62,8 +61,8 @@ void run_command(std::vector<std::string> command) {
         for (int i = 0; i < command.size(); i++) {
             strCommand[i] = const_cast<char *>(command[i].c_str());
         }
-        strCommand[command.size()] = (char *)NULL;
-        
+        strCommand[command.size()] = nullptr;
+
         // Execute the command
         // This will never return to the code if it works
         int r = execvp(command[0].c_str(), strCommand);

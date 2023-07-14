@@ -1,7 +1,9 @@
-#include "bensh.hpp"
-#include <iostream>
+// Copyright 2023 Ben Landon
+
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <iostream>
+#include "bensh.hpp"
 
 void print_centered_text_line(std::string s) {
     struct winsize w;

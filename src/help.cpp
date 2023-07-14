@@ -1,10 +1,12 @@
-#include "bensh.hpp"
-#include <cstdlib>
-#include <iostream>
-#include <filesystem>
+// Copyright 2023 Ben Landon
+
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+#include <cstdlib>
+#include <filesystem>
+#include <iostream>
+#include "bensh.hpp"
 
 namespace fs = std::filesystem;
 
@@ -34,7 +36,7 @@ std::vector<std::string> get_path_commands(void) {
     const char delim = ':';
 
     // Get a list of all dirs on path
-    const char* env_p = std::getenv("PATH");
+    const char *env_p = std::getenv("PATH");
     if (!env_p) {
         std::cerr << "\x1b[31mError: failed to load PATH.\x1b[0m\n";
         return commands;
@@ -44,7 +46,7 @@ std::vector<std::string> get_path_commands(void) {
     std::string scop = std::string(env_path);
     std::string seg = "";
     size_t pos = scop.find(delim);
-    
+
     while (pos != std::string::npos) {
         seg = scop.substr(0, pos);
         scop = scop.substr(pos + 1);
@@ -57,21 +59,24 @@ std::vector<std::string> get_path_commands(void) {
     for (int i = 0; i < paths.size(); i++) {
         // Check if the dir exists
         if (!fs::is_directory(fs::path(paths[i]))) {
-            std::cerr << "\x1b[93mWarning: directory '" << paths[i] << "' is not a valid file or directory\x1b[0m\n\r";
+            std::cerr << "\x1b[93mWarning: directory '" << paths[i]
+                      << "' is not a valid file or directory\x1b[0m\n\r";
             continue;
         }
         std::vector<std::string> files = {};
-        for (const auto & entry : fs::directory_iterator(paths[i])) {
+        for (const auto &entry : fs::directory_iterator(paths[i])) {
             files.push_back(entry.path());
         }
         for (int j = 0; j < files.size(); j++) {
             std::string fn = fs::path(files[j]).filename();
             // Exclude files with non-letter first characters
-            if (fn.c_str()[0] != '.' && ((fn.c_str()[0] <= 122 && fn.c_str()[0] >= 97) || (fn.c_str()[0] >= 65 && fn.c_str()[0] <= 90))) {
+            if (fn.c_str()[0] != '.' &&
+                ((fn.c_str()[0] <= 122 && fn.c_str()[0] >= 97) ||
+                 (fn.c_str()[0] >= 65 && fn.c_str()[0] <= 90))) {
                 commands.push_back(fn);
             }
         }
     }
-    
+
     return commands;
 }

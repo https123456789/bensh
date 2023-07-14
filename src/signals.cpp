@@ -1,7 +1,9 @@
-#include "bensh.hpp"
-#include <iostream>
+// Copyright 2023 Ben Landon
+
 #include <setjmp.h>
 #include <signal.h>
+#include <iostream>
+#include "bensh.hpp"
 
 extern pid_t childPid;
 extern sigjmp_buf env;

@@ -1,5 +1,9 @@
-#include "bensh.hpp"
+// Copyright 2023 Ben Landon
 
+#include <setjmp.h>
+#include <sys/wait.h>
+#include <termios.h>
+#include <unistd.h>
 #include <cerrno>
 #include <climits>
 #include <csignal>
@@ -8,10 +12,7 @@
 #include <iomanip>
 #include <iostream>
 #include <vector>
-#include <sys/wait.h>
-#include <termios.h>
-#include <unistd.h>
-#include <setjmp.h>
+#include "bensh.hpp"
 
 sigjmp_buf env;
 volatile sig_atomic_t jump_active = 0;
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
 
     // Terminal Configuration
     struct termios term;
-    struct termios term_save; // Save of the state
+    struct termios term_save;  // Save of the state
 
     // Change the terminal config
     tcgetattr(fileno(stdin), &term);
@@ -44,12 +45,12 @@ int main(int argc, char **argv) {
 
     term.c_iflag &= IGNCR;
 
-    term.c_cflag |= CS8; // 8 bits
+    term.c_cflag |= CS8;  // 8 bits
     term.c_lflag &=
-        (~ICANON & ~ECHO); // Disable canonical mode (if set) and echo on type
+        (~ICANON & ~ECHO);  // Disable canonical mode (if set) and echo on type
 
-    term.c_cc[VMIN] = 1;  // Minimum of 1 characters
-    term.c_cc[VTIME] = 0; // Time delay for input
+    term.c_cc[VMIN] = 1;   // Minimum of 1 characters
+    term.c_cc[VTIME] = 0;  // Time delay for input
 
     if (tcsetattr(fileno(stdin), TCSANOW, &term) < 0) {
         std::cerr << "Unable to set terminal to change terminal configuration"
@@ -73,7 +74,7 @@ int main(int argc, char **argv) {
     sigemptyset(&sigtstpa.sa_mask);
     sigtstpa.sa_flags = SA_RESTART;
     sigaction(SIGINT, &sigtstpa, NULL);
-    
+
     // SIGTERM
     sigterma.sa_handler = signalIntHandler;
     sigemptyset(&sigterma.sa_mask);
@@ -158,7 +159,8 @@ int main(int argc, char **argv) {
                 goto endLabel;
             } else if (command[0] == std::string("cd")) {
                 if (cd(command) < 0) {
-                    std::cerr << "\x1b[31mFailed to change working directory.\x1b[0m\n\r";
+                    std::cerr << "\x1b[31mFailed to change working "
+                                 "directory.\x1b[0m\n\r";
                 }
             } else if (command[0] == std::string("help")) {
                 print_help();
