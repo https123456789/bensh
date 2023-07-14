@@ -1,5 +1,6 @@
 .ccls-cache
 bin
+build
 src/**.gch
 src/**/**.gch
 src/**.o
