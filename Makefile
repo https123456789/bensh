@@ -22,6 +22,11 @@ format: $(SRC) $(HEADERS)
 	@echo "Formatting..."
 	@clang-format -i $(SRC) $(HEADERS) --Werror
 
+.PHONY: format-check
+format-check: $(SRC) $(HEADERS)
+	@echo "Checking Formatting..."
+	@clang-format --dry-run $(SRC) $(HEADERS) --Werror
+
 .PHONY: lint
 lint: $(SRC) $(HEADERS)
 	@echo "Linting..."
