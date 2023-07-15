@@ -7,16 +7,6 @@ PREFIXED_SRC := $(addprefix build/,$(SRC))
 OFILES := $(PREFIXED_SRC:cpp=o)
 CFLAGS := -Wall -std=c++20
 
-.PHONY: format
-format: $(SRC) $(HEADERS)
-	@echo "Formatting..."
-	@clang-format -i $(SRC) $(HEADERS) --Werror
-
-.PHONY: lint
-lint: $(SRC) $(HEADERS)
-	@echo "Linting..."
-	@cpplint $(SRC) $(HEADERS)
-
 $(BIN)/$(MODE)/bensh: format lint $(OFILES)
 	@mkdir -p $(BIN)/$(MODE)
 	@echo "Linking..."
@@ -27,9 +17,19 @@ build/%.o: %.cpp
 	@echo "Building $@..."
 	@$(CC) -c -o $@ $(CFLAGS) $^
 
+.PHONY: format
+format: $(SRC) $(HEADERS)
+	@echo "Formatting..."
+	@clang-format -i $(SRC) $(HEADERS) --Werror
+
+.PHONY: lint
+lint: $(SRC) $(HEADERS)
+	@echo "Linting..."
+	@cpplint $(SRC) $(HEADERS)
+
 .PHONY: clean
-clean: $(BIN)/$(MODE)/bensh $(OFILES)
-	@rm -v $^
+clean:
+	@rm -r build bin
 
 .PHONY: run
 run: $(BIN)/$(MODE)/bensh
