@@ -1,0 +1,7 @@
+*
+
+!meson.build
+!src
+!src/**/*
+!LICENSE
+!.gitignore
