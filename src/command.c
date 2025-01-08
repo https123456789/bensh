@@ -27,5 +27,17 @@ int parse_command(struct command* comm, char **src, size_t slice_start, size_t s
         comm->type = COMMAND_BUILTIN;
     }
 
+    // Bare minimum for command arguments
+    if (comm->type == COMMAND_EXEC) {
+        if ((comm->args = malloc(sizeof(char*) * 2)) < 0) {
+            fprintf(stderr, "Failed to allocate memory for command arguments!\n");
+            perror("malloc");
+            return -1;
+        }
+
+        comm->args[0] = comm->exec;
+        comm->args[1] = NULL;
+    }
+
     return 0;
 }
