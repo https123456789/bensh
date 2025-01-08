@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "command.h"
+
 /**
  * Read a single line from standard input
  */
@@ -38,7 +40,7 @@ int main() {
 
         // Handle reading errors
         if (nread < 0 && errno != 0) {
-            exit_status = EXIT_FAILURE;
+           exit_status = EXIT_FAILURE;
             break;
         }
 
@@ -48,6 +50,16 @@ int main() {
         }
 
         printf("Line read (%zd): %s\n", nread, line);
+
+        // Parse the command
+        struct command comm;
+        if (parse_command(&comm, &line, 0, nread - 1) < 0) {
+            fprintf(stderr, "Failed to parse command!\n");
+            exit_status = EXIT_FAILURE;
+            break;
+        }
+
+        printf("'%s'\n", comm.exec);
     }
 
     return exit_status;
