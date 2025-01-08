@@ -3,5 +3,7 @@
 !meson.build
 !src
 !src/**/*
+!include
+!include/**/*
 !LICENSE
 !.gitignore
