@@ -7,3 +7,4 @@
 !include/**/*
 !LICENSE
 !.gitignore
+!README.md
