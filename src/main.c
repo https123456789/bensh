@@ -40,7 +40,12 @@ void print_prompt() {
 int execute(struct command *comm) {
     // Search the path for the command
     char *path_var = get_envvar(environ, "PATH");
-    printf("PATH: '%s'\n", path_var);
+    char *search_result = search_path(path_var, comm->exec);
+
+    char *exec = search_result;
+    if (exec == NULL) {
+        exec = comm->exec;
+    }
 
     // Actually begin executing a process
     pid_t pid = fork();
@@ -52,7 +57,7 @@ int execute(struct command *comm) {
 
     // Child process
     if (pid == 0) {
-        execve(comm->exec, comm->args, environ);
+        execve(exec, comm->args, environ);
         fprintf(stderr, "Failed to execute process: %s\n", comm->exec);
         perror("execve");
         exit(EXIT_FAILURE);
@@ -89,8 +94,6 @@ int main() {
         if (strlen(line) == 0) {
             continue;
         }
-
-        printf("Line read (%zd): %s\n", nread, line);
 
         // Parse the command
         struct command comm;
