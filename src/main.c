@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "environment.h"
 #include "command.h"
 
 extern char **environ;
@@ -33,11 +34,16 @@ void print_prompt() {
     printf("-> ");
 }
 
+/**
+ * Execute the command specified by comm and wait for it to complete
+ */
 int execute(struct command *comm) {
-    pid_t pid;
+    // Search the path for the command
+    char *path_var = get_envvar(environ, "PATH");
+    printf("PATH: '%s'\n", path_var);
 
-    pid = fork();
-
+    // Actually begin executing a process
+    pid_t pid = fork();
     if (pid == -1) {
         fprintf(stderr, "Failed to execute process: %s\n", comm->exec);
         perror("fork");
@@ -93,8 +99,6 @@ int main() {
             exit_status = EXIT_FAILURE;
             break;
         }
-
-        printf("'%s'\n", comm.exec);
 
         if (comm.type == COMMAND_EXEC) {
             execute(&comm);
