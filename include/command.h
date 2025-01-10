@@ -21,4 +21,14 @@ struct command {
  */
 int parse_command(struct command* comm, char **src, size_t slice_start, size_t slice_end);
 
+/**
+ * Counts the number of args that the command string str contains
+ */
+int count_command_args(char *str, size_t slice_start, size_t slice_end);
+
+/**
+ * Returns an NULL terminated array of strings representing the command's arguments
+ */
+char** get_command_args(char *src, size_t slice_start, size_t slice_end);
+
 #endif
