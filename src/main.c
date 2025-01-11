@@ -106,6 +106,24 @@ int main() {
         if (comm.type == COMMAND_EXEC) {
             execute(&comm);
         }
+
+        if (comm.type == COMMAND_BUILTIN && strcmp(comm.exec, "cd") == 0) {
+            char *target;
+            if (comm.args == NULL || comm.args[1] == NULL) {
+                target = "~";
+            } else {
+                target = comm.args[1];
+            }
+
+            if (strcmp(target, "~") == 0) {
+                target = get_envvar(environ, "HOME");
+            }
+
+            if (chdir(target) < 0) {
+                fprintf(stderr, "Failed to change working directory to '%s'!\n", target);
+                perror("chdir");
+            }
+        }
     }
 
     return exit_status;

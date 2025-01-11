@@ -29,17 +29,15 @@ int parse_command(struct command* comm, char **src, size_t slice_start, size_t s
         comm->type = COMMAND_BUILTIN;
     }
 
-    // Fill in EXEC command args
-    if (comm->type == COMMAND_EXEC) {
-        char **command_args = get_command_args(*src, slice_start, slice_end);
+    // Fill in command args
+    char **command_args = get_command_args(*src, slice_start, slice_end);
 
-        if (command_args == NULL) {
-            fprintf(stderr, "Failed to parse command arguments!\n");
-            return -1;
-        }
-
-        comm->args = command_args;
+    if (command_args == NULL) {
+        fprintf(stderr, "Failed to parse command arguments!\n");
+        return -1;
     }
+
+    comm->args = command_args;
 
     return 0;
 }
