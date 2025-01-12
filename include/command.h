@@ -16,6 +16,16 @@ struct command {
 };
 
 /**
+ * An array of strings which lists the available builtin commands
+ */
+extern char *BUILTIN_COMMANDS[];
+
+/**
+ * An array of function pointers which map one-to-one with the BUILTIN_COMMANDS array
+ */
+extern int (*BUILTIN_COMMAND_FNS[])(struct command*); // This syntax looks so bad...
+
+/**
  * Attempts to parse the command contained in the slice of *src between slice_start and slice_end.
  * The result is stored in comm which must be allocated before any call to this function.
  */

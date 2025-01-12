@@ -1,8 +1,83 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
+#include "environment.h"
 #include "command.h"
+
+extern char **environ;
+
+char *BUILTIN_COMMANDS[] = {
+    "cd",
+    "which",
+    NULL
+};
+
+
+// BUILTIN COMMAND IMPLEMENTATIONS
+
+
+static int builtin_cd(struct command *comm) {
+    char *target;
+    if (comm->args == NULL || comm->args[1] == NULL) {
+        target = "~";
+    } else {
+        target = comm->args[1];
+    }
+
+    if (strcmp(target, "~") == 0) {
+        target = get_envvar(environ, "HOME");
+    }
+
+    if (chdir(target) < 0) {
+        fprintf(stderr, "Failed to change working directory to '%s'!\n", target);
+        perror("chdir");
+        return -1;
+    }
+
+    return 0;
+}
+
+static int builtin_which(struct command *comm) {
+    char *target;
+    if (comm->args == NULL || comm->args[1] == NULL) {
+        fprintf(stderr, "which requires a program name\n");
+        return -1;
+    } else {
+        target = comm->args[1];
+    }
+
+    // Check if the target is a builtin
+    char **current = BUILTIN_COMMANDS;
+    while (*current != NULL && strcmp(target, *current) != 0) {
+        current++;
+    }
+
+    if (*current != NULL) {
+        printf("%s is a builtin command\n", target);
+        return 0;
+    }
+
+    char *path = get_envvar(environ, "PATH");
+    char *search_result = search_path(path, target);
+
+    if (search_result != NULL) {
+        printf("%s\n", search_result);
+    } else {
+        fprintf(stderr, "Failed to find program '%s'\n", target);
+        return -1;
+    }
+
+    return 0;
+}
+
+int (*BUILTIN_COMMAND_FNS[])(struct command*) = {
+    builtin_cd,
+    builtin_which,
+    NULL
+};
+
 
 int parse_command(struct command* comm, char **src, size_t slice_start, size_t slice_end) {
     // At first, we must assume it's an exec command
@@ -25,7 +100,11 @@ int parse_command(struct command* comm, char **src, size_t slice_start, size_t s
     memcpy(comm->exec, (*src + slice_start), exec_end - slice_start);
 
     // Now that we know the program name, we can check if it is built in
-    if (strcmp(comm->exec, "cd") == 0) {
+    char **builtin_name = BUILTIN_COMMANDS;
+    while (*builtin_name != NULL && strcmp(comm->exec, *builtin_name) != 0) {
+        builtin_name++;
+    }
+    if (*builtin_name != NULL) {
         comm->type = COMMAND_BUILTIN;
     }
 

@@ -25,6 +25,7 @@ char* get_envvar(char **env, char *target) {
     return location + strlen(target) + 1; // Return only the value of the env var
 }
 
+// TODO: deal with memory leaks
 char* search_path(char *path, char *query) {
     char *result, *token;
 
@@ -41,7 +42,6 @@ char* search_path(char *path, char *query) {
     result = NULL;
 
     while (token != NULL && result == NULL) {
-        // printf("Searching PATH '%s'\n", token);
         result = search_dir(token, query);
         token = strtok(NULL, ":");
     }
@@ -82,7 +82,6 @@ char* search_dir(char *dir_path, char *query) {
             *(result + strlen(dir_path)) = '/';
             strcpy(result + strlen(dir_path) + 1, entry->d_name);
 
-            printf("Found '%s' at '%s'\n", query, result);
             break;
         }
 

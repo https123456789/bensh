@@ -107,21 +107,18 @@ int main() {
             execute(&comm);
         }
 
-        if (comm.type == COMMAND_BUILTIN && strcmp(comm.exec, "cd") == 0) {
-            char *target;
-            if (comm.args == NULL || comm.args[1] == NULL) {
-                target = "~";
-            } else {
-                target = comm.args[1];
+        if (comm.type == COMMAND_BUILTIN) {
+            // Attempt to resolve a function pointer for the builtin function
+            int i = 0;
+            char **current = BUILTIN_COMMANDS;
+            while (*current != NULL && strcmp(comm.exec, *current) != 0) {
+                i++;
+                current++;
             }
 
-            if (strcmp(target, "~") == 0) {
-                target = get_envvar(environ, "HOME");
-            }
-
-            if (chdir(target) < 0) {
-                fprintf(stderr, "Failed to change working directory to '%s'!\n", target);
-                perror("chdir");
+            int status = BUILTIN_COMMAND_FNS[i](&comm);
+            if (status < 0) {
+                fprintf(stderr, "Command failed with status code %d\n", status);
             }
         }
     }
