@@ -5,6 +5,10 @@
 !src/**/*
 !include
 !include/**/*
+!subprojects
+!subprojects/*.wrap
+!subprojects/packagefiles
+!subprojects/packagefiles/**/*
 !LICENSE
 !.gitignore
 !README.md
