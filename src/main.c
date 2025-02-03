@@ -5,8 +5,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "environment.h"
 #include "command.h"
+#include "environment.h"
+#include "lang.h"
 
 extern char **environ;
 
@@ -93,6 +94,14 @@ int main() {
         // Ignore blank lines
         if (strlen(line) == 0) {
             continue;
+        }
+
+        // Parse the line
+        struct lang_token* tokens;
+        if (lang_parse_line(&tokens, line) < 0) {
+            fprintf(stderr, "Failed to parse line!\n");
+            exit_status = EXIT_FAILURE;
+            break;
         }
 
         // Parse the command
