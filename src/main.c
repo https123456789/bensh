@@ -97,12 +97,23 @@ int main() {
         }
 
         // Parse the line
-        struct lang_token* tokens;
-        if (lang_parse_line(&tokens, line) < 0) {
+        struct lang_node* nodes;
+        int node_count;
+        if ((node_count = lang_parse_line(&nodes, line)) < 0) {
             fprintf(stderr, "Failed to parse line!\n");
             exit_status = EXIT_FAILURE;
             break;
         }
+
+        for (int i = 0; i < node_count; i++) {
+            printf("Got command (%d args): %s", nodes[i].arg_count, nodes[i].executable);
+            for (int j = 0; j < nodes[i].arg_count; j++) {
+                printf(" %s", nodes[i].args[j]);
+            }
+            printf("\n");
+        }
+
+        free(nodes);
 
         // Parse the command
         struct command comm;
