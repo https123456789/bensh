@@ -6,7 +6,7 @@
 
 #include "lang.h"
 
-/*
+/**
  * Tokenize the provided line and store the resulting ast into `result`
  */
 static int lex_line(char *src, pcq_result_t *result) {
@@ -90,11 +90,7 @@ static int ast_to_lang_node(struct lang_node *node, struct pcq_ast_t *ast) {
     memset(node->executable, 0, size);
     strcpy(node->executable, exec_src);
 
-    if (!has_args) {
-        return 0;
-    }
-
-    if ((node->args = malloc(sizeof(char*) * node->arg_count)) < 0) {
+    if ((node->args = malloc(sizeof(char*) * (node->arg_count + 2))) < 0) {
         fprintf(
             stderr,
             "Failed to allocate memory for node args list: %s\n",
@@ -104,9 +100,13 @@ static int ast_to_lang_node(struct lang_node *node, struct pcq_ast_t *ast) {
         return -1;
     }
 
+    // First and last args are special for execve
+    node->args[0] = node->executable;
+    node->args[node->arg_count + 1] = NULL;
+
     for (int i = 0; i < node->arg_count; i++) {
         int size = strlen(ast->children[i + 1]->contents) + 1;
-        if ((node->args[i] = malloc(sizeof(char) * size)) < 0) {
+        if ((node->args[i + 1] = malloc(sizeof(char) * size)) < 0) {
             fprintf(
                 stderr,
                 "Failed to allocate memory for node args field: %s\n",
@@ -114,11 +114,11 @@ static int ast_to_lang_node(struct lang_node *node, struct pcq_ast_t *ast) {
             );
 
             // TODO: implement memory cleanup
-            break;
+            return -1;
         }
 
-        memset(node->args[i], 0, size);
-        strcpy(node->args[i], ast->children[i + 1]->contents);
+        memset(node->args[i + 1], 0, size);
+        strcpy(node->args[i + 1], ast->children[i + 1]->contents);
     }
 
     return 0;
@@ -138,13 +138,10 @@ int lang_parse_line(struct lang_node** node_buf, char* src) {
 
     pcq_ast_t *ast = (pcq_ast_t*) r.output;
 
-    pcq_ast_print(r.output);
-
     int command_count = 0;
     for (int i = 0; i < ast->children_num; i++) {
         command_count += strstr(ast->children[i]->tag, "command") != NULL;
     }
-    printf("Num commands: %d\n", command_count);
 
     *node_buf = malloc(sizeof(struct lang_node) * command_count);
     if (*node_buf == NULL) {
@@ -154,7 +151,6 @@ int lang_parse_line(struct lang_node** node_buf, char* src) {
     }
     
     for (int i = 0; i < command_count; i++) {
-        printf("Converting command: %d\n", i);
         if (ast_to_lang_node(*node_buf + i, ast->children[i * 2 + 1]) < 0) {
             fprintf(stderr, "Failed to convert pcq ast to a lang node!\n");
             free(*node_buf);
@@ -164,4 +160,25 @@ int lang_parse_line(struct lang_node** node_buf, char* src) {
     }
 
     return command_count;
+}
+
+/**
+ * Parse the provided lang node into the provided command. Note that this function does not
+ * perform an allocations so `node` must not be freed before `comm`.
+ */
+int lang_parse_command(struct lang_node *node, struct command *comm) {
+    comm->exec = node->executable;
+    comm->args = node->args;
+
+    comm->type = COMMAND_EXEC;
+
+    char **builtin_name = BUILTIN_COMMANDS;
+    while (*builtin_name != NULL && strcmp(comm->exec, *builtin_name) != 0) {
+        builtin_name++;
+    }
+    if (*builtin_name != NULL) {
+        comm->type = COMMAND_BUILTIN;
+    }
+
+    return 0;
 }

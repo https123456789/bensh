@@ -106,42 +106,43 @@ int main() {
         }
 
         for (int i = 0; i < node_count; i++) {
-            printf("Got command (%d args): %s", nodes[i].arg_count, nodes[i].executable);
-            for (int j = 0; j < nodes[i].arg_count; j++) {
-                printf(" %s", nodes[i].args[j]);
+            struct command comm;
+
+            if (lang_parse_command(&nodes[i], &comm) < 0) {
+                fprintf(stderr, "Failed to parse command!\n");
+                exit_status = EXIT_FAILURE;
+
+                // Yes, I'm using a goto because it's just simpler
+                goto exit;
             }
-            printf("\n");
+
+            if (comm.type == COMMAND_EXEC) {
+                execute(&comm);
+            }
+
+            if (comm.type == COMMAND_BUILTIN) {
+                // Attempt to resolve a function pointer for the builtin function
+                int i = 0;
+                char **current = BUILTIN_COMMANDS;
+                while (*current != NULL && strcmp(comm.exec, *current) != 0) {
+                    i++;
+                    current++;
+                }
+
+                int status = BUILTIN_COMMAND_FNS[i](&comm);
+                if (status < 0) {
+                    fprintf(stderr, "Command failed with status code %d\n", status);
+                }
+            }
+
+            for (int j = 0; j < nodes[i].arg_count; j++) {
+                free(nodes[i].args[j]);
+            }
         }
 
         free(nodes);
-
-        // Parse the command
-        struct command comm;
-        if (parse_command(&comm, &line, 0, nread - 1) < 0) {
-            fprintf(stderr, "Failed to parse command!\n");
-            exit_status = EXIT_FAILURE;
-            break;
-        }
-
-        if (comm.type == COMMAND_EXEC) {
-            execute(&comm);
-        }
-
-        if (comm.type == COMMAND_BUILTIN) {
-            // Attempt to resolve a function pointer for the builtin function
-            int i = 0;
-            char **current = BUILTIN_COMMANDS;
-            while (*current != NULL && strcmp(comm.exec, *current) != 0) {
-                i++;
-                current++;
-            }
-
-            int status = BUILTIN_COMMAND_FNS[i](&comm);
-            if (status < 0) {
-                fprintf(stderr, "Command failed with status code %d\n", status);
-            }
-        }
     }
 
+exit:
     return exit_status;
 }
