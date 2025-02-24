@@ -22,8 +22,8 @@ static int lex_line(char *src, pcq_result_t *result) {
         " start: /^/; "
         " end: /$/; "
         " next: ';'; "
-        " executable: /[a-zA-Z\\/]+/; "
-        " arg: /[\\.\\-a-zA-Z\\/]+/; "
+        " executable: /[a-zA-Z0-9\\/]+/; "
+        " arg: /[\\.\\-a-zA-Z0-9\\/]+/; "
         " command: <executable> <arg>*; "
         " line: <start> (<command> <next>?)+ <end>; ",
         Start, End, Next, Executable, Arg, Command, Line, NULL);

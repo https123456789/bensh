@@ -3,8 +3,8 @@
 
 #include "sigdefs.h"
 
+// The SIGINT handler simply needs to be blank so that the signal gets passed to the child program
 static void sigint_handler(int signum, siginfo_t *info, void *context) {
-    printf("SIGINT\n");
 }
 
 int init_signal_handlers() {
