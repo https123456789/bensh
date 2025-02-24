@@ -8,6 +8,7 @@
 #include "command.h"
 #include "environment.h"
 #include "lang.h"
+#include "sigdefs.h"
 
 extern char **environ;
 
@@ -74,6 +75,11 @@ int main() {
     char *line = NULL;
     char done = 0;
     int exit_status = EXIT_SUCCESS;
+
+    if (init_signal_handlers() < 0) {
+        fprintf(stderr, "Failed to initialize signal handlers: %s\n", strerror(errno));
+        return exit_status;
+    }
 
     while (!done) {
         print_prompt();
