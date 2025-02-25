@@ -1,0 +1,11 @@
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: https://codeberg.org/Native-CI/action-meson@v1
+        with:
+          cc: "gcc"
+          cxx: "g++"
+          run_tests: true

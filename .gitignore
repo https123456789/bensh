@@ -13,3 +13,9 @@
 !.gitignore
 !README.md
 !justfile
+!tests
+!tests/**/*
+!.github
+!.github/**/*
+!.forgejo
+!.forgejo/**/*

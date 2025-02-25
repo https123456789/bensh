@@ -7,7 +7,7 @@ default:
     just --list
 
 setup:
-    meson setup build
+    meson setup build --wipe -Db_coverage=true
 
 build:
     meson compile -C build
@@ -17,3 +17,9 @@ run: build
 
 debug: build
     lldb ./build/bensh
+
+test:
+    meson test -C build
+
+coverage: setup test
+    ninja coverage-html -C build
