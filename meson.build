@@ -8,7 +8,9 @@ unity_dep = unity_subproject.get_variable('unity_dep')
 unity_gen_runner = unity_subproject.get_variable('gen_test_runner')
 
 include_dir = include_directories('include')
-sources = files('src/command.c', 'src/environment.c', 'src/lang.c', 'src/sigdefs.c')
+sources = files(
+  'src/command.c', 'src/environment.c', 'src/lang.c', 'src/sigdefs.c', 'src/execution.c'
+)
 tests = ['test_lang', 'test_command']
 
 executable(

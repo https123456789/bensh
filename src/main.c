@@ -7,6 +7,7 @@
 
 #include "command.h"
 #include "environment.h"
+#include "execution.h"
 #include "lang.h"
 #include "sigdefs.h"
 
@@ -71,13 +72,22 @@ int execute(struct command *comm) {
     return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
     char *line = NULL;
     char done = 0;
     int exit_status = EXIT_SUCCESS;
 
     if (init_signal_handlers() < 0) {
         fprintf(stderr, "Failed to initialize signal handlers: %s\n", strerror(errno));
+        exit_status = EXIT_FAILURE;
+        return exit_status;
+    }
+
+    if (argc > 1) {
+        if (execute_script(argv[1]) < 0) {
+            exit_status = EXIT_FAILURE;
+        }
+
         return exit_status;
     }
 
