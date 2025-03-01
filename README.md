@@ -2,6 +2,11 @@
 
 A shell written with my use cases in mind.
 
+## Why?
+
+This project mostly serves as a way to teach myself how to write very fault-tolerant C code.
+I expect that my shell should never crash and be relatively minimal, thus making it the perfect balance between a need for reliablity and low complexity.
+
 ## Building
 
 ```
