@@ -10,14 +10,16 @@ I expect that my shell should never crash and be relatively minimal, thus making
 ## Building
 
 ```
-meson setup build
-meson compile -C build
+just setup
+just build
 ```
 
 ## Running
 
 ```
 ./build/bensh
+#or
+just run
 ```
 
 ## Testing
