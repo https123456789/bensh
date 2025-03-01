@@ -1,2 +1,2 @@
-echo "Hello World!"
 ls -la build
+cat src/main.c
