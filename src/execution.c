@@ -23,7 +23,7 @@ int execute_line(char *line) {
     int node_count;
     if ((node_count = lang_parse_line(&nodes, line)) < 0) {
         fprintf(stderr, "Failed to parse line!\n");
-        return -1;
+        return 0;
     }
 
     for (int i = 0; i < node_count; i++) {
@@ -31,11 +31,13 @@ int execute_line(char *line) {
 
         if (lang_parse_command(&nodes[i], &comm) < 0) {
             fprintf(stderr, "Failed to parse command!\n");
-            return -1;
+            return 0;
         }
 
         if (comm.type == COMMAND_EXEC) {
-            execute(&comm);
+            if (execute(&comm) < 0) {
+                return -1;
+            }
         }
 
         if (comm.type == COMMAND_BUILTIN) {
